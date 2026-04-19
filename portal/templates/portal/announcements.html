@@ -1,0 +1,31 @@
+{% extends 'portal/student_base.html' %}
+{% block title %}Announcements – GUCPC{% endblock %}
+{% block content %}
+
+<div class="section-header">
+  <h2 class="page-title"><i class="fas fa-bullhorn"></i> Announcements</h2>
+</div>
+
+{% if announcements %}
+  {% for ann in announcements %}
+  <div class="card announcement-card">
+    <div class="ann-card-header">
+      <h3>{{ ann.title }}</h3>
+      <span class="ann-date"><i class="fas fa-clock"></i> {{ ann.created_at|date:"M d, Y" }}</span>
+    </div>
+    <div class="ann-card-body">
+      <p>{{ ann.content }}</p>
+    </div>
+  </div>
+  {% endfor %}
+{% else %}
+  <div class="card">
+    <div class="empty-state">
+      <i class="fas fa-bell-slash fa-4x"></i>
+      <h3>No Announcements</h3>
+      <p>There are no announcements at this time.</p>
+    </div>
+  </div>
+{% endif %}
+
+{% endblock %}

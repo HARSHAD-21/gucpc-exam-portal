@@ -1,0 +1,86 @@
+{% extends 'portal/student_base.html' %}
+{% block title %}Student Dashboard – GUCPC{% endblock %}
+{% block content %}
+
+<!-- Welcome Banner -->
+<div class="welcome-banner">
+  <div class="welcome-text">
+    <h2>Welcome back, {{ student.full_name|upper }}!</h2>
+    <p>You have {{ upcoming_exams }} upcoming exam{{ upcoming_exams|pluralize }} and {{ total_submissions }} submission{{ total_submissions|pluralize }} made.</p>
+  </div>
+  <div class="welcome-illustration">
+    <i class="fas fa-graduation-cap fa-4x" style="opacity:0.15;"></i>
+  </div>
+</div>
+
+<!-- Stat Cards -->
+<div class="stats-grid">
+  <div class="stat-card">
+    <div class="stat-icon" style="background: linear-gradient(135deg,#4361ee,#3a0ca3);">
+      <i class="fas fa-file-alt"></i>
+    </div>
+    <div class="stat-info">
+      <div class="stat-number">{{ upcoming_exams }}</div>
+      <div class="stat-label">Upcoming Exams</div>
+    </div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon" style="background: linear-gradient(135deg,#2dc653,#1d8c38);">
+      <i class="fas fa-check-circle"></i>
+    </div>
+    <div class="stat-info">
+      <div class="stat-number">{{ total_submissions }}</div>
+      <div class="stat-label">Total Submissions</div>
+    </div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon" style="background: linear-gradient(135deg,#f48c06,#dc6b01);">
+      <i class="fas fa-calendar-check"></i>
+    </div>
+    <div class="stat-info">
+      <div class="stat-number">{{ student.semester }}</div>
+      <div class="stat-label">Current Semester</div>
+    </div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon" style="background: linear-gradient(135deg,#4cc9f0,#0096c7);">
+      <i class="fas fa-chart-line"></i>
+    </div>
+    <div class="stat-info">
+      <div class="stat-number stat-active">{{ student.account_status }}</div>
+      <div class="stat-label">Account Status</div>
+    </div>
+  </div>
+</div>
+
+<!-- Announcements -->
+<div class="card">
+  <div class="card-header">
+    <div class="card-header-left">
+      <i class="fas fa-bullhorn"></i>
+      <h3>Important Announcements</h3>
+    </div>
+    <span class="badge badge-new">{{ announcements|length }} New</span>
+  </div>
+  <div class="card-body">
+    {% if announcements %}
+      {% for ann in announcements %}
+      <div class="announcement-item">
+        <div class="ann-dot"></div>
+        <div class="ann-content">
+          <h4>{{ ann.title }}</h4>
+          <p>{{ ann.content|truncatewords:30 }}</p>
+          <span class="ann-time">{{ ann.created_at|date:"M d, Y" }}</span>
+        </div>
+      </div>
+      {% endfor %}
+    {% else %}
+      <div class="empty-state">
+        <i class="fas fa-bell-slash fa-3x"></i>
+        <p>No announcements at this time.</p>
+      </div>
+    {% endif %}
+  </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,61 @@
+{% extends 'portal/student_base.html' %}
+{% block title %}Exam Schedule – GUCPC{% endblock %}
+{% block content %}
+
+<div class="section-header">
+  <h2 class="page-title"><i class="fas fa-calendar-alt"></i> Exam Schedule</h2>
+  <p class="page-subtitle">Semester {{ student.semester }} – {{ student.course }}</p>
+</div>
+
+<div class="card">
+  {% if exams %}
+  <div class="table-wrapper">
+    <table class="submissions-table">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Exam / Subject</th>
+          <th>Type</th>
+          <th>Date</th>
+          <th>Time</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for exam in exams %}
+        <tr class="table-row">
+          <td>{{ forloop.counter }}</td>
+          <td>
+            <div class="exam-name">{{ exam.title }}</div>
+            <div class="exam-meta">{{ exam.subject_name }} ({{ exam.subject_code }})</div>
+          </td>
+          <td><span class="type-badge">{{ exam.get_exam_type_display }}</span></td>
+          <td>{{ exam.exam_date|date:"M d, Y" }}</td>
+          <td>
+            {% if exam.start_time %}{{ exam.start_time|time:"g:i A" }}{% if exam.end_time %} – {{ exam.end_time|time:"g:i A" }}{% endif %}
+            {% else %}–{% endif %}
+          </td>
+          <td>
+            {% if exam.exam_date < today %}
+              <span class="badge-status badge-graded">Completed</span>
+            {% elif exam.exam_date == today %}
+              <span class="badge-status badge-submitted">Today</span>
+            {% else %}
+              <span class="badge-status" style="background:#e8f4fd;color:#1565c0;">Upcoming</span>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="empty-state">
+    <i class="fas fa-calendar-times fa-4x"></i>
+    <h3>No Exams Scheduled</h3>
+    <p>No exams have been scheduled for Semester {{ student.semester }} yet.</p>
+  </div>
+  {% endif %}
+</div>
+
+{% endblock %}

@@ -1,0 +1,76 @@
+{% extends 'portal/base.html' %}
+{% block body %}
+<div class="layout">
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand-icon"><i class="fas fa-graduation-cap"></i></div>
+      <span class="brand-text">Student Dashboard</span>
+    </div>
+
+    <nav class="sidebar-nav">
+      <a href="{% url 'student_dashboard' %}" class="nav-item {% if active_page == 'dashboard' %}active{% endif %}">
+        <i class="fas fa-th-large"></i><span>Dashboard</span>
+      </a>
+      <a href="{% url 'submit_exam' %}" class="nav-item {% if active_page == 'submit_exam' %}active{% endif %}">
+        <i class="fas fa-file-upload"></i><span>Submit Exam</span>
+      </a>
+      <a href="{% url 'submission_history' %}" class="nav-item {% if active_page == 'submission_history' %}active{% endif %}">
+        <i class="fas fa-history"></i><span>Submission History</span>
+      </a>
+      <a href="{% url 'exam_schedule' %}" class="nav-item {% if active_page == 'exam_schedule' %}active{% endif %}">
+        <i class="fas fa-calendar-alt"></i><span>Exam Schedule</span>
+      </a>
+      <a href="{% url 'announcements' %}" class="nav-item {% if active_page == 'announcements' %}active{% endif %}">
+        <i class="fas fa-bullhorn"></i><span>Announcements</span>
+      </a>
+      <a href="{% url 'change_password' %}" class="nav-item {% if active_page == 'change_password' %}active{% endif %}">
+        <i class="fas fa-key"></i><span>Change Password</span>
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <a href="{% url 'logout' %}" class="nav-item logout-btn">
+        <i class="fas fa-sign-out-alt"></i><span>Logout</span>
+      </a>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="main-wrapper">
+    <!-- TOP NAV -->
+    <header class="topnav">
+      <div class="topnav-left">
+        <button class="sidebar-toggle" id="sidebarToggle"><i class="fas fa-bars"></i></button>
+        <span class="portal-domain">test.techcpc.in</span>
+      </div>
+      <div class="topnav-right">
+        <button class="icon-btn"><i class="fas fa-cog"></i></button>
+        <button class="icon-btn" id="themeToggle"><i class="fas fa-moon"></i></button>
+        <div class="user-chip">
+          <div class="user-avatar">{{ student.full_name|first }}</div>
+          <span class="user-name">{{ student.full_name }}</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- MESSAGES -->
+    {% if messages %}
+    <div class="messages-container">
+      {% for msg in messages %}
+      <div class="alert alert-{{ msg.tags }}">
+        <i class="fas {% if msg.tags == 'success' %}fa-check-circle{% else %}fa-exclamation-circle{% endif %}"></i>
+        {{ msg }}
+        <button class="alert-close" onclick="this.parentElement.remove()">×</button>
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- PAGE CONTENT -->
+    <main class="page-content">
+      {% block content %}{% endblock %}
+    </main>
+  </div>
+</div>
+{% endblock %}

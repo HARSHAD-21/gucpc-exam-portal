@@ -1,0 +1,159 @@
+{% extends 'portal/base.html' %}
+{% block title %}Login Portal – GUCPC Education System{% endblock %}
+{% block body %}
+<div class="login-page">
+  <!-- Animated background blobs -->
+  <div class="bg-blob blob-1"></div>
+  <div class="bg-blob blob-2"></div>
+  <div class="bg-blob blob-3"></div>
+
+  <div class="login-card">
+    <!-- Card Header -->
+    <div class="login-card-header">
+      <div class="login-logo">
+        <i class="fas fa-graduation-cap"></i>
+      </div>
+      <h1 class="login-title">GUCPC</h1>
+      <p class="login-subtitle">Education Management System</p>
+    </div>
+
+    <!-- Messages -->
+    {% if messages %}
+    {% for msg in messages %}
+    <div class="login-alert login-alert-error">
+      <i class="fas fa-exclamation-circle"></i> {{ msg }}
+    </div>
+    {% endfor %}
+    {% endif %}
+
+    <!-- Tabs -->
+    <div class="login-card-body">
+      <div class="login-tabs">
+        <button class="login-tab active" data-tab="student">
+          <i class="fas fa-user-graduate"></i> Student
+        </button>
+        <button class="login-tab" data-tab="admin">
+          <i class="fas fa-user-shield"></i> Admin
+        </button>
+        <button class="login-tab" data-tab="faculty">
+          <i class="fas fa-chalkboard-teacher"></i> Faculty
+        </button>
+      </div>
+
+      <!-- Student Tab -->
+      <div class="tab-pane active" id="tab-student">
+        <form method="POST">
+          {% csrf_token %}
+          <input type="hidden" name="role" value="student">
+          <div class="form-group">
+            <label class="form-label">Enrollment Number</label>
+            <div class="input-wrapper">
+              <i class="fas fa-id-card input-icon"></i>
+              <input type="text" name="enrollment_number" class="form-input"
+                     placeholder="Enter Enrollment Number" value="{{ request.POST.enrollment_number }}" required>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Password</label>
+            <div class="input-wrapper">
+              <i class="fas fa-lock input-icon"></i>
+              <input type="password" name="password" id="studentPwd" class="form-input" placeholder="Enter Your Password" required>
+              <button type="button" class="pwd-toggle" onclick="togglePwd('studentPwd', this)">
+                <i class="fas fa-eye"></i>
+              </button>
+            </div>
+          </div>
+          <div class="forgot-link-row">
+            <a href="#" class="forgot-link">Forgot Password?</a>
+          </div>
+          <button type="submit" class="btn-login">
+            <i class="fas fa-sign-in-alt"></i> Login
+          </button>
+        </form>
+      </div>
+
+      <!-- Admin Tab -->
+      <div class="tab-pane" id="tab-admin">
+        <form method="POST">
+          {% csrf_token %}
+          <input type="hidden" name="role" value="admin">
+          <div class="form-group">
+            <label class="form-label">Username</label>
+            <div class="input-wrapper">
+              <i class="fas fa-user input-icon"></i>
+              <input type="text" name="username" class="form-input" placeholder="Admin username" required>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Password</label>
+            <div class="input-wrapper">
+              <i class="fas fa-lock input-icon"></i>
+              <input type="password" name="password" id="adminPwd" class="form-input" placeholder="Enter Your Password" required>
+              <button type="button" class="pwd-toggle" onclick="togglePwd('adminPwd', this)">
+                <i class="fas fa-eye"></i>
+              </button>
+            </div>
+          </div>
+          <div class="forgot-link-row">
+            <a href="#" class="forgot-link">Forgot Password?</a>
+          </div>
+          <button type="submit" class="btn-login"><i class="fas fa-sign-in-alt"></i> Login</button>
+        </form>
+      </div>
+
+      <!-- Faculty Tab -->
+      <div class="tab-pane" id="tab-faculty">
+        <form method="POST">
+          {% csrf_token %}
+          <input type="hidden" name="role" value="faculty">
+          <div class="form-group">
+            <label class="form-label">Faculty ID</label>
+            <div class="input-wrapper">
+              <i class="fas fa-id-badge input-icon"></i>
+              <input type="text" name="faculty_id" class="form-input" placeholder="Faculty ID" required>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Password</label>
+            <div class="input-wrapper">
+              <i class="fas fa-lock input-icon"></i>
+              <input type="password" name="password" id="facultyPwd" class="form-input" placeholder="Enter Your Password" required>
+              <button type="button" class="pwd-toggle" onclick="togglePwd('facultyPwd', this)">
+                <i class="fas fa-eye"></i>
+              </button>
+            </div>
+          </div>
+          <div class="forgot-link-row">
+            <a href="#" class="forgot-link">Forgot Password?</a>
+          </div>
+          <button type="submit" class="btn-login"><i class="fas fa-sign-in-alt"></i> Login</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// Tab switching
+document.querySelectorAll('.login-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.login-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById('tab-' + tab.dataset.tab).classList.add('active');
+  });
+});
+
+function togglePwd(id, btn) {
+  const input = document.getElementById(id);
+  const icon = btn.querySelector('i');
+  if (input.type === 'password') {
+    input.type = 'text';
+    icon.className = 'fas fa-eye-slash';
+  } else {
+    input.type = 'password';
+    icon.className = 'fas fa-eye';
+  }
+}
+</script>
+{% endblock %}

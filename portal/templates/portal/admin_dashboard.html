@@ -1,0 +1,120 @@
+{% extends 'portal/base.html' %}
+{% block title %}Admin Dashboard – GUCPC{% endblock %}
+{% block body %}
+<div class="layout">
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand-icon"><i class="fas fa-graduation-cap"></i></div>
+      <span class="brand-text">Admin Panel</span>
+    </div>
+    <nav class="sidebar-nav">
+      <a href="#" class="nav-item active"><i class="fas fa-th-large"></i><span>Dashboard</span></a>
+      <a href="/admin/" class="nav-item"><i class="fas fa-cog"></i><span>Django Admin</span></a>
+    </nav>
+    <div class="sidebar-footer">
+      <a href="{% url 'logout' %}" class="nav-item logout-btn">
+        <i class="fas fa-sign-out-alt"></i><span>Logout</span>
+      </a>
+    </div>
+  </aside>
+  <div class="main-wrapper">
+    <header class="topnav">
+      <div class="topnav-left">
+        <button class="sidebar-toggle" id="sidebarToggle"><i class="fas fa-bars"></i></button>
+        <span class="portal-domain">test.techcpc.in</span>
+      </div>
+      <div class="topnav-right">
+        <div class="user-chip">
+          <div class="user-avatar">A</div>
+          <span class="user-name">{{ admin.full_name }}</span>
+        </div>
+      </div>
+    </header>
+    <main class="page-content">
+      <div class="welcome-banner">
+        <div class="welcome-text">
+          <h2>Admin Dashboard</h2>
+          <p>GUCPC Education Management System – Administration Portal</p>
+        </div>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon" style="background:linear-gradient(135deg,#4361ee,#3a0ca3);">
+            <i class="fas fa-users"></i>
+          </div>
+          <div class="stat-info">
+            <div class="stat-number">{{ total_students }}</div>
+            <div class="stat-label">Total Students</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon" style="background:linear-gradient(135deg,#2dc653,#1d8c38);">
+            <i class="fas fa-check-circle"></i>
+          </div>
+          <div class="stat-info">
+            <div class="stat-number">{{ total_submissions }}</div>
+            <div class="stat-label">Total Submissions</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon" style="background:linear-gradient(135deg,#f48c06,#dc6b01);">
+            <i class="fas fa-file-alt"></i>
+          </div>
+          <div class="stat-info">
+            <div class="stat-number">{{ total_exams }}</div>
+            <div class="stat-label">Total Exams</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-header-left">
+            <i class="fas fa-history"></i>
+            <h3>Recent Submissions</h3>
+          </div>
+        </div>
+        {% if recent_submissions %}
+        <div class="table-wrapper">
+          <table class="submissions-table">
+            <thead>
+              <tr>
+                <th>Student</th>
+                <th>Exam</th>
+                <th>File</th>
+                <th>Time</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for sub in recent_submissions %}
+              <tr class="table-row">
+                <td>
+                  <div class="exam-name">{{ sub.student.full_name }}</div>
+                  <div class="exam-meta">{{ sub.student.enrollment_number }}</div>
+                </td>
+                <td>{{ sub.exam.title }}</td>
+                <td>
+                  <a href="{{ sub.file.url }}" target="_blank" class="view-link">
+                    <i class="fas fa-file-pdf"></i> {{ sub.original_filename|truncatechars:30 }}
+                  </a>
+                </td>
+                <td>{{ sub.submitted_at|date:"M d, Y g:i A" }}</td>
+                <td><span class="badge-status badge-submitted">{{ sub.get_status_display }}</span></td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        {% else %}
+        <div class="empty-state">
+          <i class="fas fa-inbox fa-3x"></i>
+          <p>No submissions yet.</p>
+        </div>
+        {% endif %}
+      </div>
+    </main>
+  </div>
+</div>
+{% endblock %}

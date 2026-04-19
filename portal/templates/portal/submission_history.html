@@ -1,0 +1,108 @@
+{% extends 'portal/student_base.html' %}
+{% block title %}Submission History – GUCPC{% endblock %}
+{% block content %}
+
+<div class="section-header">
+  <h2 class="page-title"><i class="fas fa-history"></i> Submission History</h2>
+</div>
+
+<!-- Filters -->
+<div class="filters-row">
+  <form method="GET" class="filters-form">
+    <select name="sort" class="filter-select" onchange="this.form.submit()">
+      <option value="newest" {% if sort == 'newest' %}selected{% endif %}>Newest First</option>
+      <option value="oldest" {% if sort == 'oldest' %}selected{% endif %}>Oldest First</option>
+    </select>
+    <select name="status" class="filter-select" onchange="this.form.submit()">
+      <option value="all" {% if status_filter == 'all' %}selected{% endif %}>All Status</option>
+      <option value="submitted" {% if status_filter == 'submitted' %}selected{% endif %}>Submitted</option>
+      <option value="graded" {% if status_filter == 'graded' %}selected{% endif %}>Graded</option>
+      <option value="rejected" {% if status_filter == 'rejected' %}selected{% endif %}>Rejected</option>
+    </select>
+  </form>
+</div>
+
+<!-- Submissions Table -->
+<div class="card">
+  <div class="card-header">
+    <div class="card-header-left">
+      <i class="fas fa-list"></i>
+      <h3>All Submissions</h3>
+    </div>
+    <span class="badge badge-count">Showing {{ submissions|length }} submission{{ submissions|length|pluralize }}</span>
+  </div>
+
+  {% if submissions %}
+  <div class="table-wrapper">
+    <table class="submissions-table">
+      <thead>
+        <tr>
+          <th>Exam Details</th>
+          <th>Submitted File</th>
+          <th>Submission Time</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for sub in submissions %}
+        <tr class="table-row">
+          <td class="exam-details-cell">
+            <div class="exam-name">{{ sub.exam.title }}</div>
+            <div class="exam-meta">
+              <i class="fas fa-book"></i> {{ sub.exam.subject_name }} ({{ sub.exam.subject_code }})
+            </div>
+            <div class="exam-date">
+              <i class="fas fa-calendar"></i> {{ sub.exam.exam_date|date:"M d, Y" }}
+            </div>
+          </td>
+          <td class="file-cell">
+            <div class="file-item">
+              <div class="file-icon-wrap">
+                <i class="fas fa-file-pdf"></i>
+              </div>
+              <div class="file-info">
+                <span class="file-name">{{ sub.original_filename }}</span>
+                <div class="file-meta">
+                  <span><i class="fas fa-hdd"></i> {{ sub.file_size_display }}</span>
+                  <a href="{{ sub.file.url }}" target="_blank" class="view-link">
+                    <i class="fas fa-eye"></i> View Only
+                  </a>
+                </div>
+              </div>
+            </div>
+          </td>
+          <td class="time-cell">
+            <div class="sub-time">{{ sub.submitted_at|date:"M j, Y" }}</div>
+            <div class="sub-hour">{{ sub.submitted_at|date:"g:i A" }}</div>
+          </td>
+          <td class="status-cell">
+            {% if sub.status == 'submitted' %}
+              <span class="badge-status badge-submitted">
+                <i class="fas fa-paper-plane"></i> Submitted
+              </span>
+            {% elif sub.status == 'graded' %}
+              <span class="badge-status badge-graded">
+                <i class="fas fa-check-double"></i> Graded
+              </span>
+            {% elif sub.status == 'rejected' %}
+              <span class="badge-status badge-rejected">
+                <i class="fas fa-times"></i> Rejected
+              </span>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="empty-state">
+    <i class="fas fa-inbox fa-4x"></i>
+    <h3>No Submissions Found</h3>
+    <p>You haven't submitted any exams yet.</p>
+    <a href="{% url 'submit_exam' %}" class="btn-primary-sm">Submit Your First Exam</a>
+  </div>
+  {% endif %}
+</div>
+
+{% endblock %}

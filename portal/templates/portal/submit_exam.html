@@ -1,0 +1,177 @@
+{% extends 'portal/student_base.html' %}
+{% block title %}Submit Exam – GUCPC{% endblock %}
+{% block content %}
+
+<div class="page-header">
+  <a href="{% url 'student_dashboard' %}" class="back-link">
+    <i class="fas fa-arrow-left"></i> Back to Dashboard
+  </a>
+  <h2 class="page-title">Submit Exam</h2>
+  <p class="page-subtitle">Upload your completed Exam and projects</p>
+</div>
+
+<!-- Student Info Card -->
+<div class="card info-card">
+  <div class="info-grid">
+    <div class="info-item">
+      <span class="info-label">Student Name</span>
+      <span class="info-value">{{ student.full_name }}</span>
+    </div>
+    <div class="info-item">
+      <span class="info-label">Enrollment Number</span>
+      <span class="info-value">{{ student.enrollment_number }}</span>
+    </div>
+    <div class="info-item">
+      <span class="info-label">Course</span>
+      <span class="info-value">{{ student.course }}</span>
+    </div>
+    <div class="info-item">
+      <span class="info-label">Semester</span>
+      <span class="info-value">{{ student.semester }}</span>
+    </div>
+    <div class="info-item">
+      <span class="info-label">Email</span>
+      <span class="info-value">{{ student.email }}</span>
+    </div>
+  </div>
+</div>
+
+<!-- Guidelines -->
+<div class="guidelines-box">
+  <h4><i class="fas fa-info-circle"></i> Submission Guidelines</h4>
+  <ul>
+    <li>Select the exam file you want to submit</li>
+    <li>Upload files in PDF, DOC, DOCX, ZIP, RAR, JPG, or PNG format</li>
+    <li><strong>Files of any size are supported via chunked upload.</strong></li>
+    <li class="text-danger"><strong>You can submit each assignment/exam file only once.</strong></li>
+    <li>Some assignments/exam may require an access token</li>
+    <li class="text-success"><strong>A confirmation email will be sent to your registered email address after successful submission.</strong></li>
+  </ul>
+</div>
+
+<!-- Submission Form -->
+<div class="card">
+  <div class="card-body">
+    <form method="POST" enctype="multipart/form-data" id="submitForm">
+      {% csrf_token %}
+
+      <!-- Exam Select -->
+      <div class="form-group">
+        <label class="form-label">Select Assignment/Exam</label>
+        <select name="exam_id" class="form-select" id="examSelect" required>
+          <option value="">Choose an assignment/Exam file...</option>
+          {% for exam in all_exams %}
+            {% if exam.id in submitted_exam_ids %}
+              <option value="{{ exam.id }}" disabled class="option-submitted">
+                ✗ {{ exam.title }} ({{ exam.subject_code }}) – Already Submitted
+              </option>
+            {% else %}
+              <option value="{{ exam.id }}" class="option-available">
+                {{ exam.title }} ({{ exam.subject_code }}) – {{ exam.exam_date|date:"M d, Y" }}
+              </option>
+            {% endif %}
+          {% endfor %}
+        </select>
+        <div class="select-legend">
+          <span class="legend-green"><i class="fas fa-circle"></i> Green – Available</span>
+          <span class="legend-red"><i class="fas fa-circle"></i> Red – Already submitted (disabled)</span>
+        </div>
+      </div>
+
+      <!-- Access Token (shown conditionally) -->
+      <div class="form-group" id="tokenGroup" style="display:none;">
+        <label class="form-label">Access Token</label>
+        <div class="input-wrapper">
+          <i class="fas fa-key input-icon"></i>
+          <input type="text" name="access_token" class="form-input" placeholder="Enter access token">
+        </div>
+      </div>
+
+      <!-- File Upload -->
+      <div class="form-group">
+        <label class="form-label">Upload Your File</label>
+        <div class="upload-zone" id="uploadZone">
+          <input type="file" name="submission_file" id="fileInput"
+                 accept=".pdf,.doc,.docx,.zip,.rar,.jpg,.jpeg,.png" required>
+          <div class="upload-content" id="uploadContent">
+            <div class="upload-icon"><i class="fas fa-cloud-upload-alt"></i></div>
+            <p class="upload-text">Click to upload your file</p>
+            <p class="upload-hint">Supported formats: PDF, DOC, DOCX, ZIP, RAR, JPG, PNG (any size)</p>
+          </div>
+          <div class="file-preview" id="filePreview" style="display:none;">
+            <i class="fas fa-file-pdf file-preview-icon"></i>
+            <div class="file-preview-info">
+              <span class="file-preview-name" id="fileName"></span>
+              <span class="file-preview-size" id="fileSize"></span>
+            </div>
+            <button type="button" class="remove-file" onclick="removeFile()">
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Progress Bar (upload) -->
+      <div class="progress-wrapper" id="progressWrapper" style="display:none;">
+        <div class="progress-bar-track">
+          <div class="progress-bar-fill" id="progressBar"></div>
+        </div>
+        <span class="progress-text" id="progressText">Uploading...</span>
+      </div>
+
+      <button type="submit" class="btn-submit" id="submitBtn">
+        <i class="fas fa-paper-plane"></i> Submit Assignment/exam
+      </button>
+    </form>
+  </div>
+</div>
+
+<script>
+const uploadZone = document.getElementById('uploadZone');
+const fileInput = document.getElementById('fileInput');
+const uploadContent = document.getElementById('uploadContent');
+const filePreview = document.getElementById('filePreview');
+
+uploadZone.addEventListener('click', (e) => {
+  if (!e.target.classList.contains('remove-file') && !e.target.closest('.remove-file')) {
+    fileInput.click();
+  }
+});
+
+uploadZone.addEventListener('dragover', e => { e.preventDefault(); uploadZone.classList.add('drag-over'); });
+uploadZone.addEventListener('dragleave', () => uploadZone.classList.remove('drag-over'));
+uploadZone.addEventListener('drop', e => {
+  e.preventDefault();
+  uploadZone.classList.remove('drag-over');
+  if (e.dataTransfer.files.length) {
+    fileInput.files = e.dataTransfer.files;
+    showFile(e.dataTransfer.files[0]);
+  }
+});
+
+fileInput.addEventListener('change', () => {
+  if (fileInput.files.length) showFile(fileInput.files[0]);
+});
+
+function showFile(file) {
+  uploadContent.style.display = 'none';
+  filePreview.style.display = 'flex';
+  document.getElementById('fileName').textContent = file.name;
+  const sz = file.size;
+  document.getElementById('fileSize').textContent = sz > 1048576
+    ? (sz / 1048576).toFixed(2) + ' MB'
+    : (sz / 1024).toFixed(2) + ' KB';
+}
+
+function removeFile() {
+  fileInput.value = '';
+  uploadContent.style.display = 'flex';
+  filePreview.style.display = 'none';
+}
+
+document.getElementById('submitForm').addEventListener('submit', function() {
+  document.getElementById('submitBtn').disabled = true;
+  document.getElementById('submitBtn').innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting...';
+});
+</script>
+{% endblock %}
